@@ -1,4 +1,12 @@
 asgiref==3.5.2
+certifi==2022.5.18.1
+charset-normalizer==2.0.12
+coverage==6.4.1
+coveralls==3.3.1
 Django==4.0.5
+docopt==0.6.2
+idna==3.3
+requests==2.27.1
 sqlparse==0.4.2
 tzdata==2022.1
+urllib3==1.26.9
