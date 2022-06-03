@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import Metadata
+from metadata.models import Metadata
 from django.contrib.auth import get_user_model
 
 
@@ -12,7 +12,7 @@ class MetadataTestCase(TestCase):
 
     def test_metadata_init(self):
         """Metadata adds timestamp and user"""
-        md = Metadata.objects.get(created_by=self.user)
+        user = User.objects.get(username="pepe")
+        md = Metadata.objects.get(created_by=user)
         print(md)
-        # self.assertEqual(lion.speak(), 'The lion says "roar"')
-        # self.assertEqual(cat.speak(), 'The cat says "meow"')
+        self.assertEqual(True, True)

@@ -1,3 +1,4 @@
 from django.contrib import admin
+from metadata.models import Metadata
 
-# Register your models here.
+admin.site.register(Metadata)
