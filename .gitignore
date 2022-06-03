@@ -1,4 +1,10 @@
 env/
+
 .coveralls.yml
+
+__pychache__*
+__pychache__/
 *.pyc
+
+
 *.sqlite3
