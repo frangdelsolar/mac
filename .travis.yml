@@ -10,4 +10,5 @@ install:
 script:
   - cd miconsu
   - coverage run manage.py test
+  - coverage report
   # - coveralls
