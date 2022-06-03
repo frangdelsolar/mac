@@ -1,6 +1,7 @@
 env/
 
 .coveralls.yml
+.coverage
 
 __pychache__*
 __pychache__/
