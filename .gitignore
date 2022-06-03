@@ -1,4 +1,4 @@
 env/
-.coveralls
+.coveralls.yml
 *.pyc
 *.sqlite3
