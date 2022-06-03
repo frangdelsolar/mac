@@ -11,3 +11,9 @@ class ClientTypeTestCase(TestCase):
         ct = ClientType.objects.filter(name="Professional")
 
         self.assertEqual(ct.count(), 1)
+
+    def test_client_type_str(self):
+        """Client Type String"""
+        ct = ClientType.objects.get(name="Professional")
+
+        self.assertEqual(ct.__str__(), "Professional")

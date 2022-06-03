@@ -23,3 +23,9 @@ class ClientTestCase(TestCase):
         self.assertEqual(c.administrator.username, "pepe")
         self.assertEqual(c.client_type.name, "Professional")
         self.assertEqual(c.client_plan.name, "Plan Nuevo")
+
+    def test_client_str(self):
+        """Client String"""
+        c= Client.objects.get(name="Pedro")
+
+        self.assertEqual(c.__str__(), "Pedro")
