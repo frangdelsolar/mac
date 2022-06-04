@@ -7,7 +7,7 @@ from .views import ClientViewSet, ClientTypeViewSet, ClientPlanViewSet
 app_name = 'client-api'
 
 router = routers.DefaultRouter()
-router.register(r'client', ClientViewSet)
+router.register(r'client', ClientViewSet, basename='clients-api')
 router.register(r'client-type', ClientTypeViewSet)
 router.register(r'client-plan', ClientPlanViewSet)
 

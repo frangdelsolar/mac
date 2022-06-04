@@ -1,7 +1,7 @@
 from django.test import TestCase
 from client.models import ClientType, ClientPlan, Client
-from client.api.serializers import ClientSerializer, ClientPlanSerializer, ClientTypeSerializer
-from django.contrib.auth import get_user_model
+from client.api.serializers import ClientSerializer
+from django.contrib.auth import get_user_model 
 from collections import OrderedDict
 
 
