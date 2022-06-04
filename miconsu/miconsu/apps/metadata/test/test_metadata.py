@@ -18,3 +18,10 @@ class MetadataTestCase(TestCase):
         self.assertEqual(md.updated_by, user)
         self.assertIsNotNone(md.date_created)
         self.assertIsNotNone(md.last_update)
+
+    def test_metadata_str(self):
+        """Metadata String"""
+        user = User.objects.get(username="pepe")
+        md = Metadata.objects.get(created_by=user)
+
+        self.assertIn("pepe", md.__str__())

@@ -2,6 +2,7 @@ env/
 
 .coveralls.yml
 .coverage
+*htmlcov/*
 
 __pychache__*
 __pychache__/
