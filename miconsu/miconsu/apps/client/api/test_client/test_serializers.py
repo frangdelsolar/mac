@@ -60,4 +60,6 @@ class ClientSerializerTestCase(TestCase):
         serializer.is_valid()
         instance = serializer.save()
         self.assertEqual(instance.name, data['name'])
+        self.assertEqual(instance.administrator.username, 'pepitohonguito')
         self.assertEqual(instance.client_type.name, 'Otro Tipo')
+        self.assertEqual(instance.client_plan.name, 'Plan Nuevo')
