@@ -6,22 +6,16 @@ User = get_user_model()
 
 class MetadataTestCase(TestCase):
     def setUp(self):
-        user = User.objects.create(username="pepe", password="1234")
-        Metadata.objects.create(created_by=user, updated_by=user)
+        self.user = User.objects.create(username="pepe", password="1234")
+        self.metadata = Metadata.objects.create(created_by=self.user, updated_by=self.user)
 
     def test_metadata_init(self):
         """Metadata adds timestamp and user"""
-        user = User.objects.get(username="pepe")
-        md = Metadata.objects.get(created_by=user)
-
-        self.assertEqual(md.created_by, user)
-        self.assertEqual(md.updated_by, user)
-        self.assertIsNotNone(md.date_created)
-        self.assertIsNotNone(md.last_update)
+        self.assertEqual(self.metadata.created_by, self.user)
+        self.assertEqual(self.metadata.updated_by, self.user)
+        self.assertIsNotNone(self.metadata.date_created)
+        self.assertIsNotNone(self.metadata.last_update)
 
     def test_metadata_str(self):
         """Metadata String"""
-        user = User.objects.get(username="pepe")
-        md = Metadata.objects.get(created_by=user)
-
-        self.assertIn("pepe", md.__str__())
+        self.assertEqual(self.metadata.__str__(), '1')
