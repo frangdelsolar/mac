@@ -34,7 +34,7 @@ class ClientSerializerTestCase(TestCase):
     def test_client_get_item(self):
         """Get Item Client"""
         serializer = ClientSerializer(self.client_one)
-        self.assertEqual(serializer.data, {'id': 1, 'name': 'Cliente 1', 'administrator': OrderedDict([('id', 1), ('username', 'pepito'), ('first_name', 'Pepe'), ('last_name', 'Honguito'), ('email', 'pepe@honguito.com'), ('roles', [])]), 'client_plan': OrderedDict([('id', 1), ('name', 'Plan Nuevo')]), 'client_type': OrderedDict([('id', 1), ('name', 'Professional')])})
+        self.assertEqual(serializer.data, {'id': 1, 'name': 'Cliente 1', 'administrator': OrderedDict([('id', 1), ('username', 'pepito'), ('first_name', 'Pepe'), ('last_name', 'Honguito'), ('email', 'pepe@honguito.com')]), 'client_plan': OrderedDict([('id', 1), ('name', 'Plan Nuevo')]), 'client_type': OrderedDict([('id', 1), ('name', 'Professional')])})
 
     def test_client_get_items(self):
         """Get Items Client"""
@@ -47,17 +47,17 @@ class ClientSerializerTestCase(TestCase):
         data = {
             'name': 'Nuevo Cliente',
             'administrator': {
-                'username': 'pepito'
+                'username': 'pepitohonguito'
             },
             'client_type': {
-                'id': 1
+                'name': 'Otro Tipo'
             },
             'client_plan':{
-                'id': 1
+                'name': "Plan Nuevo"
             }
         }
-
         serializer = ClientSerializer(data=data)
         serializer.is_valid()
         instance = serializer.save()
         self.assertEqual(instance.name, data['name'])
+        self.assertEqual(instance.client_type.name, 'Otro Tipo')
