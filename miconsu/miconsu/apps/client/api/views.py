@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from client.models import Client, ClientType, ClientPlan
-from client.api.serializers import ClientTypeSerializer, ClientPlanSerializer
+from client.api.serializers import ClientTypeSerializer, ClientPlanSerializer, ClientSerializer
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -15,6 +15,6 @@ class ClientPlanViewSet(viewsets.ModelViewSet):
     serializer_class = ClientPlanSerializer
 
 
-# class ClientViewSet(viewsets.ModelViewSet):
-#     queryset = Client.objects.all()
-#     serializer_class = ClientSerializer
+class ClientViewSet(viewsets.ModelViewSet):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer

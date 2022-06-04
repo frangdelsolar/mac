@@ -4,32 +4,6 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-class ClientPlanTestCase(TestCase):
-    def setUp(self):
-        self.cp = ClientPlan.objects.create(name="Plan Nuevo")
-
-    def test_client_plan_init(self):
-        """Client Plan is created"""
-        self.assertEqual(self.cp.name, 'Plan Nuevo')
-
-    def test_client_plan_str(self):
-        """Client Plan String"""
-        self.assertEqual(self.cp.__str__(), "Plan Nuevo")
-        
-
-class ClientTypeTestCase(TestCase):
-    def setUp(self):
-        self.ct = ClientType.objects.create(name="Professional")
-
-    def test_client_type_init(self):
-        """Client Type is created"""
-        self.assertEqual(self.ct.name, 'Professional')
-
-    def test_client_type_str(self):
-        """Client Type String"""
-        self.assertEqual(self.ct.__str__(), "Professional")
-
-
 class ClientTestCase(TestCase):
     def setUp(self):
         self.admin = User.objects.create(username="pepe", password="1234")

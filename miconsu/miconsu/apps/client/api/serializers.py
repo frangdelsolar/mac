@@ -37,3 +37,6 @@ class ClientSerializer(HyperlinkedModelSerializer):
             'client_plan',
             'client_type',
         ]
+
+    def create(self, validated_data):
+        return Client(**validated_data)
