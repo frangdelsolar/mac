@@ -30,7 +30,6 @@ class Client(models.Model):
     client_plan = models.ForeignKey('client.ClientPlan', on_delete=models.CASCADE, verbose_name='Plan', related_name="client_plan")
     client_type = models.ForeignKey('client.ClientType', on_delete=models.CASCADE, verbose_name='Tipo de cliente', related_name="client_plan")
 
-
     class Meta:
         verbose_name = 'Cliente'
         verbose_name_plural = 'Clientes'

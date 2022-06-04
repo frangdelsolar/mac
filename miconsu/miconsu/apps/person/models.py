@@ -1,8 +1,5 @@
 from django.db import models
-from django.utils.text import slugify
-from metadata.models import Metadata
 import datetime
-import itertools
 from person.enum.gender import GenderEnum
 from person.enum.level_of_studies import LevelOfStudiesEnum
 from person.enum.marital_status import MaritalStatusEnum
