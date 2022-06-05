@@ -15,6 +15,10 @@ class Profile(models.Model):
         return f'{self.user.username}'
 
     @classmethod
+    def get_by_user_id(self, id):
+        return Profile.objects.get(user__id = id)
+
+    @classmethod
     def get_by_user(self, user):
         qs = Profile.objects.filter(user=user)
         if qs.count() <= 0:
