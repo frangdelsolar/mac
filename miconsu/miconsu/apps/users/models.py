@@ -12,7 +12,7 @@ class Profile(models.Model):
         verbose_name_plural = 'Perfiles de usuario'
 
     def __str__(self):
-        return str(self.pk)
+        return f'{self.user.username}'
 
     @classmethod
     def get_by_user(self, user):

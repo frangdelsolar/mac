@@ -1,37 +1,22 @@
 from django.test import TestCase
-from rest_framework import status
-from rest_framework.test import APITestCase, APIClient, APIRequestFactory
-from rest_framework.reverse import reverse
+from rest_framework.test import APIRequestFactory, force_authenticate
 from client.api.views import ClientViewSet
 from client.models import Client, ClientPlan, ClientType
 from django.contrib.auth import get_user_model 
+from users.enum import UserRoles
+from users.models import Profile
 
 
 User = get_user_model()
 
 class URLTest(TestCase):
-    def setUp(self):
-        self.user_one = User.objects.create(
-            username="pepito",
-            first_name="Pepe",
-            last_name="Honguito",
-            email="pepe@honguito.com"
-        )
-        self.cp = ClientPlan.objects.create(name="Plan Nuevo")
-        self.ct = ClientType.objects.create(name="Professional")
-        self.client_one = Client.objects.create(
-            name="Cliente 1",
-            administrator=self.user_one,
-            client_plan=self.cp,
-            client_type=self.ct
-        )
+    fixtures = ['clients.json']
 
-        self.client_two = Client.objects.create(
-            name="Cliente 2",
-            administrator=self.user_one,
-            client_plan=self.cp,
-            client_type=self.ct
-        )
+    def setUp(self):
+        self.professional_user = User.objects.get(username="Professional")
+        self.no_profile_user = User.objects.get(username='NoProfileUser')
+        self.no_client_profile = User.objects.get(username='NoClientProfileUser')
+        self.app_admin = User.objects.get(username='AppAdmin')
 
     def test_list__403__null__not_authenticated(self):
         """List View should return Forbidden if user is not authenticated"""
@@ -40,22 +25,43 @@ class URLTest(TestCase):
         response = list_view(api_request)
         self.assertEqual(response.status_code, 403)
 
-    def test_list__200__all_clients__super_administrator(self):
-        """List View should return all clients if user is super administrator"""
+    def test_list__500__empty__no_profile_user(self):
+        """List View should return status 500 if user has no profile"""
         api_request = APIRequestFactory().get("")
         list_view = ClientViewSet.as_view({'get': 'list'})
+        force_authenticate(api_request, user=self.no_profile_user)
+        response = list_view(api_request)
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.data, {'Error': 'El usuario no tiene un perfil configurado'})
+
+    def test_list__200__all_clients__app_administrator(self):
+        """List View should return all clients if user is app administrator"""
+        api_request = APIRequestFactory().get("")
+        list_view = ClientViewSet.as_view({'get': 'list'})
+        force_authenticate(api_request, user=self.app_admin)
         response = list_view(api_request)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
 
-    # def test_list_should_return_self_client_if_user_not_super_administrator(self):
-    #     api_request = APIRequestFactory().get("")
-    #     detail_view = ClientViewSet.as_view({'get': 'list'})
-    #     response = detail_view(api_request)
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(len(response.data), Client.objects.all().count())
+    def test_list__200__self_client__not_app_administrator(self):
+        """List View should return corresponding client if user is not administrator"""
+        api_request = APIRequestFactory().get("")
+        detail_view = ClientViewSet.as_view({'get': 'list'})
+        force_authenticate(api_request, user=self.professional_user)
+        response = detail_view(api_request)
+        self.assertEqual(response.status_code, 200)
+        profile = Profile.get_by_user(self.professional_user)
+        self.assertEqual(response.data[0]['id'], profile.client.id)
 
-    
+    def test_list__500__empty__profile_no_client(self):
+        """List View should return status 500 if profile has no client"""
+        api_request = APIRequestFactory().get("")
+        list_view = ClientViewSet.as_view({'get': 'list'})
+        force_authenticate(api_request, user=self.no_profile_user)
+        response = list_view(api_request)
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.data, {'Error': 'El usuario no tiene un perfil configurado'})
+
     # def test_create_should_return_403_if_not_super_administrator(self):
     #     api_request = APIRequestFactory().get("")
     #     detail_view = ClientViewSet.as_view({'get': 'create'})
