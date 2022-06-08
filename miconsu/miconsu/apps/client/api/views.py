@@ -3,13 +3,12 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from client.models import Client, ClientType, ClientPlan
 from client.api.serializers import ClientTypeSerializer, ClientPlanSerializer, ClientSerializer
-from users.enum import UserRoles
-from users.models import Profile
-
+from utils.authentication.response_auth_profile_client_valid import response_auth_profile_client_valid as is_profile_valid
+from utils.authentication.get_profile_and_roles import get_profile_and_roles
 from django.contrib.auth import get_user_model 
+from users.enum import UserRoles
 
 User = get_user_model()
-
 
 
 class ClientTypeViewSet(viewsets.ModelViewSet):
@@ -27,32 +26,28 @@ class ClientViewSet(viewsets.ModelViewSet):
     serializer_class = ClientSerializer
 
     def list(self, request):
-        queryset = Client.objects.none()
+        error_response = is_profile_valid(request)
+        if error_response:
+            return error_response
+        
+        profile, user_roles = get_profile_and_roles(request)
 
-        profile = Profile.get_by_user(request.user)
-        if not profile:
-            return Response(data={'Error': 'El usuario no tiene un perfil configurado'}, status=500)
 
-        user_roles = profile.get_user_groups_list()
         if UserRoles.APP_ADMINISTRATOR.value in user_roles:
-            queryset = Client.objects.all()
-
+            self.queryset = Client.objects.all()
         else:
             if not profile.client:
                 return Response(data={'Error': 'El perfil de usuario no tiene un cliente configurado'}, status=500)
-            queryset = Client.objects.filter(id=profile.client.id)
+            self.queryset = Client.objects.filter(id=profile.client.id)
 
-        serializer = self.serializer_class(queryset, many=True)
+        serializer = self.serializer_class(self.queryset, many=True)
         return Response(serializer.data)
 
     def create(self, request):
-        profile = Profile.get_by_user(request.user)
-        if not profile:
-            return Response(data={'Error': 'El usuario no tiene un perfil configurado'}, status=500)
+        profile, user_roles = is_profile_valid(request)
 
-        user_roles = profile.get_user_groups_list()
         if not UserRoles.APP_ADMINISTRATOR.value in user_roles:
-            return Response(data={'Error': 'El usuario no tiene permiso para crear un cliente'}, status=403)
+            return Response(data={'Error': 'El usuario no tiene permiso de realizar esta acción'}, status=403)
 
         name = request.data.get('name')
         administrator_id = request.data.get('administrator_id')
@@ -78,8 +73,24 @@ class ClientViewSet(viewsets.ModelViewSet):
         instance.save()
         return Response(ClientSerializer(instance).data)
 
-    # def retrieve(self, request, pk=None):
-    #     pass
+    def retrieve(self, request, pk=None):
+        profile, user_roles = is_profile_valid(request)
+
+        filtered_clients = Client.objects.filter(id=pk)
+        if filtered_clients.count() <= 0:
+            return Response(data={'Error': 'Cliente inexistente'}, status=500)
+
+        instance = filtered_clients.last()
+        serializer = self.serializer_class(instance)
+
+        if UserRoles.APP_ADMINISTRATOR.value in user_roles:
+            return Response(serializer.data)
+
+        if instance == profile.client:
+            return Response(serializer.data)
+                   
+        return Response(data={'Error': 'El usuario no tiene permiso para ver este cliente'}, status=500)
+
 
     # def update(self, request, pk=None):
     #     pass

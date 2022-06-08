@@ -27,8 +27,8 @@ class ClientPlan(models.Model):
 class Client(models.Model):
     name = models.CharField(max_length=255)
     administrator = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name='Administrador', related_name='client_administered', null=True, blank=True)
-    client_plan = models.ForeignKey('client.ClientPlan', on_delete=models.CASCADE, verbose_name='Plan', related_name="client_plan")
-    client_type = models.ForeignKey('client.ClientType', on_delete=models.CASCADE, verbose_name='Tipo de cliente', related_name="client_plan")
+    client_plan = models.ForeignKey('client.ClientPlan', on_delete=models.CASCADE, verbose_name='Plan', related_name="client_plan", null=True, blank=True)
+    client_type = models.ForeignKey('client.ClientType', on_delete=models.CASCADE, verbose_name='Tipo de cliente', related_name="client_plan", null=True, blank=True)
 
     class Meta:
         verbose_name = 'Cliente'

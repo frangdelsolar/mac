@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'metadata',
     'person',
     'users',
+    'utils'
 ]
 
 MIDDLEWARE = [
