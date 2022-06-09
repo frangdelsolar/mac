@@ -3,6 +3,17 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
+    "paths": {
+      "@assets/*": ["src/assets/*"],
+      "@auth/*": ["src/app/pages/auth/*"],
+      "@core/*": ["src/app/core/*"],
+      "@env/*": ["src/environments/*"],
+      "@features/*": ["src/app/features/*"],
+      "@models/*": ["src/app/core/models/*"],
+      "@shared/*": ["src/app/shared/*"],
+      "@util/*": ["src/app/core/util/*"],
+      "@app/*": ["src/app/*"]
+    },
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
     "strict": true,

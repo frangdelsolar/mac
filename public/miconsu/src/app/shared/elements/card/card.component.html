@@ -1,0 +1,9 @@
+<mat-card>
+    <mat-card-title>{{header}}</mat-card-title>
+    <mat-card-subtitle>{{subheader}}</mat-card-subtitle>
+    {{body}}
+    <ng-content></ng-content>
+    <mat-card-actions align="end">
+        <button mat-button [routerLink]="link">Ver</button>
+    </mat-card-actions>
+</mat-card>
