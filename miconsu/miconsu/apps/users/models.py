@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 class Profile(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, primary_key=True)
     person = models.ForeignKey('person.Person', on_delete=models.CASCADE, verbose_name='Persona', null=True, blank=True)
-    client = models.ForeignKey('client.Client', on_delete=models.PROTECT, verbose_name='Cliente', blank=True, null=True)
+    client = models.ForeignKey('client.Client', on_delete=models.CASCADE, verbose_name='Cliente', blank=True, null=True)
 
     class Meta:
         verbose_name = 'Perfil de usuario'

@@ -17,10 +17,15 @@ class URLTest(APITestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.get_request = self.factory.get("")
+        self.post_request = self.factory.post("", {}, format="json")
+        self.put_request = self.factory.put("", {}, format="json")
+        self.delete_request = self.factory.delete("")
 
         self.list_view = ClientViewSet.as_view({'get': 'list'})
         self.create_view = ClientViewSet.as_view({'post': 'create'})
         self.detail_view = ClientViewSet.as_view({'get': 'retrieve'})
+        self.update_view = ClientViewSet.as_view({'put': 'update'})
+        self.delete_view = ClientViewSet.as_view({'delete': 'destroy'})
 
         self.professional_user = User.objects.get(username="Professional")
         self.no_profile_user = User.objects.get(username='NoProfileUser')
@@ -63,31 +68,17 @@ class URLTest(APITestCase):
 
     def test_create__403__not_authenticated(self):
         """Create View should not be available for Anonymous user"""
-        data = {
-            'name': 'Novo Cliente',
-            'administrator_id': 1,
-            'client_type_id': 2,
-            'client_plan_id': 2
-            }
-        post_request = self.factory.post("", data, format="json")
-        response = self.create_view(post_request, data=data)
+        response = self.create_view(self.post_request, data={})
         self.assertEqual(response.status_code, 403)
 
     def test_create__403__not_app_administrator(self):
         """Create View should not be available for not AppAdministrator user"""
-        data = {
-            'name': 'Novo Cliente',
-            'administrator_id': 1,
-            'client_type_id': 2,
-            'client_plan_id': 2
-        }
-        post_request = self.factory.post("", data, format="json")
-        force_authenticate(post_request, user=self.professional_user)
-        response = self.create_view(post_request)
+        force_authenticate(self.post_request, user=self.professional_user)
+        response = self.create_view(self.post_request)
         self.assertEqual(response.status_code, 403)
 
     def test_create__200__app_administrator(self):
-        """Create View should not be available for not AppAdministrator user"""
+        """Create View should be available for AppAdministrator user"""
         data = {
             'name': 'Novo Cliente',
             'administrator_id': 1,
@@ -120,53 +111,81 @@ class URLTest(APITestCase):
         response = self.detail_view(request, pk=3)
         self.assertEqual(response.status_code, 403)
 
-    # def test_detail_should_return_403_if_user_access_other_client(self):
-    #     get_request = APIRequestFactory().get("")
-    #     detail_view = ClientViewSet.as_view({'get': 'retrieve'})
-    #     response = detail_view(get_request, self.client_one.id)
-    #     self.assertEqual(response.status_code, 200)
-    #     response = detail_view(get_request, self.client_two.id)
-    #     self.assertEqual(response.status_code, 403)
-
-    # def test_detail_should_return_202_if_user_super_administrator(self):
-    #     get_request = APIRequestFactory().get("")
-    #     detail_view = ClientViewSet.as_view({'get': 'retrieve'})
-    #     response = detail_view(get_request, self.client_one.id)
-    #     self.assertEqual(response.status_code, 200)
-    #     response = detail_view(get_request, self.client_two.id)
-    #     self.assertEqual(response.status_code, 200)
-
-    
-    # def test_update_should_return_202_if_user_access_self_client(self):
-    #     pass
-
-    # def test_update_should_return_403_if_user_access_other_client(self):
-    #     pass
-
-    # def test_update_should_return_202_if_user_super_administrator(self):
-    #     pass
-    
-    
-    # def test_partial_update_should_return_202_if_user_access_self_client(self):
-    #     pass
-
-    # def test_partial_update_should_return_403_if_user_access_other_client(self):
-    #     pass
-
-    # def test_partial_update_should_return_202_if_user_super_administrator(self):
-    #     pass
+    def test_detail__200__app_administrator__any_client(self):
+        """Detail View should return self client detail"""
+        force_authenticate(self.get_request, user=self.app_admin)
+        response = self.detail_view(self.get_request, pk=4)
+        self.assertEqual(response.status_code, 200)
+        response = self.detail_view(self.get_request, pk=3)
+        self.assertEqual(response.status_code, 200)
 
 
-    # def test_destroy_should_return_403_if_not_super_administrator(self):
-    #     get_request = APIRequestFactory().get("")
-    #     delete_view = ClientViewSet.as_view({'get': 'destroy'})
-    #     response = delete_view(get_request, pk=self.client_one.id)
-    #     self.assertEqual(response.status_code, 403)
+    def test_update__403__not_authenticated(self): 
+        """Update View should not be available for anonymous user"""
+        response = self.update_view(self.put_request, pk=4)
+        self.assertEqual(response.status_code, 403)
+
+    def test_update__403__not_app_admin(self):
+        """Update View should not be available for other than app admin"""
+        force_authenticate(self.put_request, user=self.professional_user)
+        response = self.update_view(self.put_request, pk=4)
+        self.assertEqual(response.status_code, 403)
+
+    def test_update__200__app_admin(self):
+        """Update View should be available for app admin"""
+        force_authenticate(self.put_request, user=self.app_admin)
+        response = self.update_view(self.put_request, pk=4)
+        self.assertEqual(response.status_code, 200)
+
+    def test_update__object_is_updated(self):
+        """Object is updated"""
+        client_id = 4
+        client = Client.objects.get(id=client_id)
+        original_name = client.name
+        original_administrator_id = client.administrator.id
+        original_client_type_id = client.client_type.id
+        original_client_plan_id = client.client_plan.id
+        data = {
+            'name': 'Cliente Modificado',
+            'administrator_id': 5,
+            'client_type_id': 3,
+            'client_plan_id': 2
+        }
+        put_request = self.factory.put("", data, format="json")
+        force_authenticate(put_request, user=self.app_admin)
+        response = self.update_view(put_request, pk=client_id)
+        self.assertNotEqual(original_name, response.data.get('name'))
+        self.assertNotEqual(original_administrator_id, response.data.get('administrator_id'))
+        self.assertNotEqual(original_client_type_id, response.data.get('client_type_id'))
+        self.assertNotEqual(original_client_plan_id, response.data.get('client_plan_id'))
+        self.assertEqual(data['name'], response.data.get('name'))
+        self.assertEqual(data['administrator_id'], response.data.get('administrator')['id'])
+        self.assertEqual(data['client_type_id'], response.data.get('client_type')['id'])
+        self.assertEqual(data['client_plan_id'], response.data.get('client_plan')['id'])
 
 
-    # def test_destroy_should_return_200_if_super_administrator(self):
-    #     get_request = APIRequestFactory().get("")
-    #     delete_view = ClientViewSet.as_view({'get': 'destroy'})
-    #     response = delete_view(get_request, pk=self.client_one.id)
-    #     print(response.data)
-    #     self.assertEqual(response.status_code, 200)
+    def test_delete__403__not_authenticated(self): 
+        """Delete View should not be available for anonymous user"""
+        response = self.delete_view(self.delete_request, pk=4)
+        self.assertEqual(response.status_code, 403)
+
+    def test_update__403__not_app_admin(self):
+        """Delete View should not be available for other than app admin"""
+        force_authenticate(self.delete_request, user=self.professional_user)
+        response = self.delete_view(self.delete_request, pk=4)
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete__200__app_admin(self):
+        """Delete View should be available for app admin"""
+        force_authenticate(self.delete_request, user=self.app_admin)
+        response = self.delete_view(self.delete_request, pk=4)
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete__object_is_deleted(self):
+        """Object is deleted"""
+        client_id =4
+        instance = Client.objects.get(id=client_id)
+        force_authenticate(self.delete_request, user=self.app_admin)
+        response = self.delete_view(self.delete_request, pk=client_id)
+        filtered_client = Client.objects.filter(id=client_id)
+        self.assertEqual(filtered_client.count(), 0)
