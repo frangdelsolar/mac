@@ -12,7 +12,7 @@ export class ClientDetailComponent implements OnInit {
   header: string = "Cliente";
   subheader: string = "Detalle";
 
-  client: Client = {
+  object: Client = {
     id: 1,
     name: 'Pepe',
     administrator: "Francisco Javier",
