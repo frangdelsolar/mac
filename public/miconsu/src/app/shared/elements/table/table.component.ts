@@ -7,6 +7,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSort, Sort} from '@angular/material/sort';
 import { FormControl } from '@angular/forms';
+import { PaginatedResponse } from '@core/models/paginated-response.interface';
 
 @Component({
   selector: 'app-table',
@@ -29,7 +30,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 
   // Data
   @Input() columns!: any[];
-  @Input() dataSource!: Observable<any>;
+  @Input() dataSource!: Observable<PaginatedResponse>;
   @Input() refresh!: BehaviorSubject<boolean>; // Delete
   displayedColumns:string[] = [];
   selection = new SelectionModel<any>(true, []);

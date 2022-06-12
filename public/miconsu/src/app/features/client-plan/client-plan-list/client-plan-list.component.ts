@@ -1,5 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { DialogData } from '@core/models/dialog.interface';
+import { DialogService } from '@core/services/dialog.service';
+import { SnackbarService } from '@core/services/snackbar.service';
+import { BehaviorSubject } from 'rxjs';
+import { ClientPlanService } from '../client-plan-controller.service';
+import { ClientPlanFormComponent } from '../client-plan-form/client-plan-form.component';
 import { ClientPlan } from '../client-plan.interface';
 
 @Component({
@@ -10,74 +15,57 @@ import { ClientPlan } from '../client-plan.interface';
 export class ClientPlanListComponent implements OnInit {
   header: string = "Planes de Servicio";
   subheader: string = "Listado";
-  baseUrl= '/';
+  baseUrl: string = "administrador/plan";
 
-  objects: ClientPlan[] = [
+  values!: any;
+  refresh = new BehaviorSubject<boolean>(false);
+
+  columns = [
     {
-      id: 1,
-      name: 'Plan Eterno',
+      columnDef: 'id',
+      header: 'Id',
+      cell: (client_plan: ClientPlan) => `${client_plan.id}`,
     },
     {
-      id: 2,
-      name: 'Plan Nuevo',
+      columnDef: 'name',
+      header: 'Nombre',
+      cell: (client_plan: ClientPlan) => `${client_plan.name}`,
     },
-    {
-      id: 3,
-      name: 'Plan 3',
-    },
-    {
-      id: 4,
-      name: 'Plan 4',
-    },
-    {
-      id: 5,
-      name: 'Plan 5',
-    },
-    {
-      id: 6,
-      name: 'Plan 6',
-    }
-  ]
 
-  values$ = new Observable<any>();
-  // this.values$.next({
-  //     count: 6, 
-  //     previous: 4,
-  //     next: 7,
-  //     results: this.objects
-  //   })
-  
-    columns = [
-      {
-        columnDef: 'id',
-        header: 'Id',
-        cell: (client: ClientPlan) => `${client.id}`,
-      },
-      {
-        columnDef: 'name',
-        header: 'Nombre',
-        cell: (client: ClientPlan) => `${client.name}`,
-      }
-    ];
+  ];
 
-
-  constructor(
-
-    ) { }
+    
+    constructor(
+      public service: ClientPlanService, 
+      private dialogSvc: DialogService,
+      private snackSvc: SnackbarService) { }
 
   ngOnInit(): void {
-
+    this.values = this.service.getAll()
   }
 
-  addItem(){
-
+  addItem(event:any){
+    let dialogData: DialogData = {
+      component: ClientPlanFormComponent,
+      params: {
+        model: 'person', 
+        referenced_object_id: 3
+      }
+    }
+    this.dialogSvc.show(dialogData);
   }
 
-  editItem(id: any){
+  editItem(event:any){
+    this.refresh.next(true);
+    this.snackSvc.openSnackBar('Elemento eliminado correctamente');
 
   }
 
   deleteItem(id: number){
+    this.service.delete(id).subscribe(res=>{
+      this.snackSvc.openSnackBar('Elemento eliminado correctamente');
+      this.refresh.next(true);
 
+    });
   }
 }

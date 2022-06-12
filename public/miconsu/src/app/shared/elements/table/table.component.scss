@@ -1,0 +1,20 @@
+.demo-table {
+    width: 100%;
+  }
+
+  td.mat-column-actions {
+    width: 20px;
+    padding-right: 8px;
+  }
+  
+  th.mat-column-id, td.mat-column-id {
+    padding-left: 20px;
+  }
+  
+  .mat-table-sticky-border-elem-right {
+    border-left: 1px solid #e0e0e0;
+  }
+  
+  .mat-table-sticky-border-elem-left {
+    border-right: 1px solid #e0e0e0;
+  }

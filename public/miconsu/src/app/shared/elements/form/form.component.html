@@ -1,0 +1,22 @@
+<div class="container">
+  <div class="header">
+    <div class="title">
+      <h2>{{header}}</h2>
+    </div>
+    <div class="subtitle">
+      <p>{{subheader}}</p>
+    </div>
+  </div>
+      
+  <ng-content></ng-content>
+  
+  <div class="footer" align=end>
+    <button mat-button *ngIf="showClearButton" (click)="clearForm()" color="warn"> Limpiar</button>
+    <button mat-button *ngIf="showCancelButton" (click)="cancel()"> Cancelar</button>
+    <button mat-flat-button *ngIf="showSubmitButton" (click)="onSubmit()" color="primary"> {{ btnLabel }}</button>
+  </div>
+</div>
+
+
+
+

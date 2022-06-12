@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ClientPlanService } from '../client-plan-controller.service';
 import { clientPlanEnum } from '../client-plan.enum';
 import { ClientPlan } from '../client-plan.interface';
 
@@ -11,14 +12,15 @@ export class ClientPlanDetailComponent implements OnInit {
   header: string = "Plan de Servicios";
   subheader: string = "Detalle";
 
-  object: ClientPlan = {
-    id: 1,
-    name: 'Plan Eterno',
-  }
+  object!: ClientPlan;
   labels = clientPlanEnum;
-  constructor() { }
+  constructor(private service: ClientPlanService) { }
 
   ngOnInit(): void {
+    this.service.getById(4).subscribe(item=>{
+      this.object=item
+
+    })
   }
 
 }

@@ -49,7 +49,7 @@ class URLTest(APITestCase):
         force_authenticate(self.get_request, user=self.app_admin)
         response = self.list_view(self.get_request)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data['results']), 2)
 
     def test_list__500__empty__profile_no_client(self):
         """List View should return status 500 if profile has no client"""
@@ -64,7 +64,7 @@ class URLTest(APITestCase):
         response = self.list_view(self.get_request)
         self.assertEqual(response.status_code, 200)
         profile = Profile.get_by_user(self.professional_user)
-        self.assertEqual(response.data[0]['id'], profile.client.id)
+        self.assertEqual(response.data['results'][0]['id'], profile.client.id)
 
     def test_create__403__not_authenticated(self):
         """Create View should not be available for Anonymous user"""

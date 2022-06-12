@@ -3,11 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ElementsModule } from './elements/elements.module';
 import { MaterialModule } from './material.module';
 import { RouterModule } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const myModules = [
   ElementsModule,
   MaterialModule,
-  RouterModule
+  ReactiveFormsModule,
+  RouterModule,
+
 ]
 
 @NgModule({

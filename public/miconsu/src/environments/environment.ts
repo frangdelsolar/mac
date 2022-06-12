@@ -3,9 +3,38 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
-};
+  production: false,
+  apiUrl: '',
+  apiUrlAddress: '',
+  apiUrlAgreement: '',
+  apiUrlAppointment: '',
+  apiUrlAppointmentEvent: '',
+  apiUrlAppointmentByPatientId: '',
+  apiUrlCalendar: '',
+  apiUrlClient: '',
+  apiUrlClientPlan: 'api/client-plan/',
+  apiUrlClientType: '',
+  apiUrlEmail: '',
+  apiUrlInsurance: '',
+  apiUrlInsuranceProfessional: '',
+  apiUrlLocation: '',
+  apiUrlLogin: '',
+  apiUrlOrganization: '',
+  apiUrlOrganizationalService: '',
+  apiUrlPatient: '',
+  apiUrlPayment: '',
+  apiUrlPaymentMethod: '',
+  apiUrlPerson: '',
+  apiUrlPhone: '',
+  apiUrlPrescription: '',
+  apiUrlProfessional: '',
+  apiUrlProfile: '',
+  apiUrlRegister: '',
+  apiUrlReferrer: "",
+  apiUrlService: '',
+  apiUrlUser: '',
 
+};
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.

@@ -1,12 +1,16 @@
 <app-table
     [tableHeader]="header"
-    [dataSource]="values$"
+    [dataSource]="values"
     [columns]="columns"
     [baseUrl]="baseUrl"
+    [service]="service"
     [showBulkDelete]="false"
     [showDelete]="true"
     [showEdit]="true"
     [showView]="false"
     [showAdd]="true"
-
+    [refresh]="refresh"
+    (emitCreate)="addItem($event)"
+    (emitEdit)="editItem($event)"
+    (emitDelete)="deleteItem($event)"
 ></app-table>

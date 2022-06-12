@@ -6,10 +6,14 @@ import { RouterModule } from '@angular/router';
 import { ListFromObjectComponent } from './list-from-object/list-from-object.component';
 import { TableComponent } from './table/table.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { DialogComponent } from './dialog/dialog.component';
+import { FormComponent } from './form/form.component';
 
 
 const myComponents = [
   CardComponent,
+  DialogComponent,
+  FormComponent,
   ListFromObjectComponent,
   TableComponent,
 
