@@ -1,6 +1,5 @@
 import { Component, Input, OnInit, Output, EventEmitter, Inject } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DialogService } from '@core/services/dialog.service';
 
 
@@ -12,7 +11,7 @@ import { DialogService } from '@core/services/dialog.service';
 export class FormComponent implements OnInit {
   @Input() header!: string;
   @Input() subheader!: string;
-  btnLabel: string = "Añadir";
+  btnLabel: string = "Guardar";
 
   @Input() showCard: boolean = true;
   @Input() showClearButton: boolean = true;
@@ -26,7 +25,7 @@ export class FormComponent implements OnInit {
 
   constructor(
     private dialogSvc: DialogService,
-    @Inject(MAT_DIALOG_DATA) public dialogData: any 
+   
   ) {
   }
 

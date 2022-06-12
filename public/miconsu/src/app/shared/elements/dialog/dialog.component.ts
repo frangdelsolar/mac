@@ -44,8 +44,8 @@ export class DialogComponent implements OnInit {
     };
     let dialogRef = this.dialog.open(this.data.component, data )
     
-    dialogRef.afterClosed().subscribe(result => {
-      // console.log({result})
+    dialogRef.afterClosed().subscribe(() => {
+      this.dialogSvc.announceClose();
     });
   }
 

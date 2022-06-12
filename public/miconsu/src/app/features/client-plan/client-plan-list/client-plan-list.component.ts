@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { DialogData } from '@core/models/dialog.interface';
 import { DialogService } from '@core/services/dialog.service';
 import { SnackbarService } from '@core/services/snackbar.service';
-import { BehaviorSubject } from 'rxjs';
+import { TableService } from '@shared/elements/table/table.service';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ClientPlanService } from '../client-plan-controller.service';
+import { ClientPlanDetailComponent } from '../client-plan-detail/client-plan-detail.component';
 import { ClientPlanFormComponent } from '../client-plan-form/client-plan-form.component';
 import { ClientPlan } from '../client-plan.interface';
 
@@ -17,9 +19,6 @@ export class ClientPlanListComponent implements OnInit {
   subheader: string = "Listado";
   baseUrl: string = "administrador/plan";
 
-  values!: any;
-  refresh = new BehaviorSubject<boolean>(false);
-
   columns = [
     {
       columnDef: 'id',
@@ -31,41 +30,65 @@ export class ClientPlanListComponent implements OnInit {
       header: 'Nombre',
       cell: (client_plan: ClientPlan) => `${client_plan.name}`,
     },
-
   ];
-
     
-    constructor(
-      public service: ClientPlanService, 
-      private dialogSvc: DialogService,
-      private snackSvc: SnackbarService) { }
+  constructor(
+    public service: ClientPlanService, 
+    private dialogSvc: DialogService,
+    private snackSvc: SnackbarService,
+    private tableSvc: TableService
+  ) { }
 
   ngOnInit(): void {
-    this.values = this.service.getAll()
+    this.service.getAll().subscribe(res=>{
+      this.tableSvc.setTableData(res);
+    })
   }
 
-  addItem(event:any){
+  applyFilter(params: string){
+    this.service.filter(params).subscribe(res=>{
+      this.tableSvc.setTableData(res);
+    })
+  }
+
+  viewItem(id: number){
     let dialogData: DialogData = {
-      component: ClientPlanFormComponent,
-      params: {
-        model: 'person', 
-        referenced_object_id: 3
-      }
+      component: ClientPlanDetailComponent,
+      params: {'id': id}
     }
     this.dialogSvc.show(dialogData);
   }
 
-  editItem(event:any){
-    this.refresh.next(true);
-    this.snackSvc.openSnackBar('Elemento eliminado correctamente');
+  addItem(){
+    let dialogData: DialogData = {
+      component: ClientPlanFormComponent,
+      params: {}
+    }
+    this.dialogSvc.show(dialogData);
+    this.dialogSvc.hasClosedObservable.subscribe(res=>{
+      if(res){
+        this.ngOnInit();
+      }
+    })
+  }
 
+  editItem(id: number){
+    let dialogData: DialogData = {
+      component: ClientPlanFormComponent,
+      params: {'id': id}
+    }
+    this.dialogSvc.show(dialogData);
+    this.dialogSvc.hasClosedObservable.subscribe(res=>{
+      if(res){
+        this.ngOnInit();
+      }
+    })
   }
 
   deleteItem(id: number){
     this.service.delete(id).subscribe(res=>{
       this.snackSvc.openSnackBar('Elemento eliminado correctamente');
-      this.refresh.next(true);
-
+      this.ngOnInit();
     });
   }
 }

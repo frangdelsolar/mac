@@ -4,7 +4,7 @@
 
   <mat-form-field appearance="standard">
     <mat-label>Buscar</mat-label>
-    <input matInput [formControl]="searchControl" (keyup)="applySearch()" placeholder="Ej: palabra" #input>
+    <input matInput [formControl]="searchControl" (keyup)="searchChanged()" placeholder="Ej: palabra" #input>
   </mat-form-field>
 
   <table mat-table [dataSource]="data" class="mat-elevation-z8 demo-table" matSort (matSortChange)="announceSortChange($event)">
@@ -44,9 +44,9 @@
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #actionMenu="matMenu">
-          <button mat-menu-item *ngIf="showView" (click)="viewItem(row.id)">Ver</button>
-          <button mat-menu-item *ngIf="showEdit" (click)="editItem(row.id)">Editar</button>
-          <button mat-menu-item *ngIf="showDelete" (click)="deleteItem(row.id)">Eliminar</button>
+          <button mat-menu-item *ngIf="showView" (click)="onClickViewItem(row.id)">Ver</button>
+          <button mat-menu-item *ngIf="showEdit" (click)="onClickEditItem(row.id)">Editar</button>
+          <button mat-menu-item *ngIf="showDelete" (click)="onClickDeleteItem(row.id)">Eliminar</button>
         </mat-menu>
       </td>
     </ng-container>
@@ -57,7 +57,6 @@
 
   <mat-paginator 
     [length]="tableLength"
-    [pageSizeOptions]="[5, 10, 20]"
     (page)="pageChanged($event)"
     showFirstLastButtons>
   </mat-paginator>
@@ -66,6 +65,6 @@
     <button *ngIf="editMode" mat-button color="warn" (click)="bulkDelete()">Eliminar</button>
     <button mat-button *ngIf="!editMode && showBulkDelete" (click)="switchEditMode()">Editar</button>
     <button mat-button *ngIf="editMode" (click)="switchEditMode()">Terminar edición</button>
-    <button mat-flat-button  *ngIf="showAdd" color="primary" (click)="addItem()">Añadir</button>
+    <button mat-flat-button  *ngIf="showAdd" color="primary" (click)="onClickAddItem()">Añadir</button>
   </mat-card-actions>
 </mat-card>

@@ -1,6 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, ViewChild, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Router } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -8,6 +7,8 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatSort, Sort} from '@angular/material/sort';
 import { FormControl } from '@angular/forms';
 import { PaginatedResponse } from '@core/models/paginated-response.interface';
+import { TableService } from './table.service';
+import { SnackbarService } from '@core/services/snackbar.service';
 
 @Component({
   selector: 'app-table',
@@ -18,20 +19,10 @@ export class TableComponent implements OnInit, AfterViewInit {
   
   @Input() tableHeader!: string;
   @Input() tableSubHeader!: string;
-  @Input() baseUrl!: string;
-  @Input() service!: any;
-
-  //Actions
-  @Input() showBulkDelete: boolean = false;
-  @Input() showDelete: boolean = false;
-  @Input() showEdit: boolean = false;
-  @Input() showView: boolean = false;
-  @Input() showAdd: boolean = false;
+  @Input() columns!: any[];
 
   // Data
-  @Input() columns!: any[];
-  @Input() dataSource!: Observable<PaginatedResponse>;
-  @Input() refresh!: BehaviorSubject<boolean>; // Delete
+  dataSource!: Observable<PaginatedResponse>;
   displayedColumns:string[] = [];
   selection = new SelectionModel<any>(true, []);
 
@@ -45,8 +36,15 @@ export class TableComponent implements OnInit, AfterViewInit {
 
   // State
   editMode = false;
+  @Input() showBulkDelete: boolean = true;
+  @Input() showDelete: boolean = true;
+  @Input() showEdit: boolean = true;
+  @Input() showView: boolean = true;
+  @Input() showAdd: boolean = true;
 
   // Actions
+  @Output() emitFilter = new EventEmitter<string>();
+  @Output() emitView = new EventEmitter<number>();
   @Output() emitCreate = new EventEmitter<number>();
   @Output() emitEdit = new EventEmitter<number>();
   @Output() emitDelete = new EventEmitter<number>();
@@ -54,80 +52,76 @@ export class TableComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  _filters: {[key:string]: string} = {
+    'search': '',
+    'ordering': '',
+    'page': ''
+  };
 
   constructor(
-    private router: Router,
-    ) {}
+    private service: TableService,
+    private snackSvc: SnackbarService,
+  ) {
+  }
 
+  ngOnInit(): void {
+    this.dataSource = this.service.TableDataObservable;
+    this.displayedColumns =  this.columns.map(c => c.columnDef);
+    if (this.showActions()) this.displayedColumns.push('actions');
+    this.loadData();
+  }
 
   ngAfterViewInit() {
     this.data.paginator = this.paginator;
     this.data.sort = this.sort;
   }
 
-  ngOnInit(): void {
-    this.displayedColumns =  this.columns.map(c => c.columnDef);
-    if (this.showActions()) this.displayedColumns.push('actions');
-    this.refreshData();
-
-  }
-
-  refreshData(){
+  loadData(){
     this.dataSource.subscribe(res=>{
-      this.data = new MatTableDataSource<any>(res.results);
-      this.tableLength = res.count;
-      this.data.paginator = this.paginator;
+      if (res){
+        this.tableLength = res.count;
+        this.paginator.pageSize = res.results.length;
+        this.paginator.length = res.count;
+        this.data = new MatTableDataSource<any>(res.results);
+      }
     })
   }
 
-  applySearch() {
-    let search = this.searchControl.value;
-    let params = `?search=${search}`
-    this.service.getAll(params).subscribe( (res: any) => {
-      this.data = new MatTableDataSource<any>(res.results);
-      this.tableLength = res.count;
-      this.data.paginator = this.paginator;
-    })
+  // Filters And Search
+  applyFilters() {
+    let params = '';
+    for (let key in this._filters){
+      if (this._filters[key] !== ''){
+        if (params == ''){
+          params += `?${key}=${this._filters[key]}`
+        } else {
+          params += `&${key}=${this._filters[key]}`
+        }
+      }
+    }
+    this.emitFilter.next(params);
+  }
+
+  searchChanged(){
+    this._filters['search'] = this.searchControl.value;
+    this.applyFilters();
   }
 
   announceSortChange(sortState: Sort) {
-    let params = `?ordering=${sortState.active}`;
+    this._filters['ordering'] = `${sortState.active}`;
     if (sortState.direction == 'desc'){
-      params = `?ordering=-${sortState.active}`
-    }
-
-    let search = this.searchControl.value;
-    if (search) params += `&search=${search}`;
-
-    let limit = this.data.paginator?.pageSize;
-    if (limit) params += `&limit=${limit}`
-    
-    this.service.getAll(params).subscribe( (res: any) => {
-      this.data = new MatTableDataSource<any>(res.results);
-      this.tableLength = res.count;
-      this.data.paginator = this.paginator;
-    })
+      this._filters['ordering'] = `-${sortState.active}`;
+    }    
+    this.applyFilters();
   }
 
   pageChanged(event: any){
-    let limit = event.pageSize;
-    let offset = event.pageSize * event.pageIndex;
-    let params = `?limit=${limit}&offset=${offset}`
-
-    let search = this.searchControl.value;
-    if (search) params += `&search=${search}`;
-
-    let order = this.sort.active;
-    if (order) {
-      if (this.sort.direction == "asc") params += `&ordering=${order}`;
-      if (this.sort.direction == "desc") params += `&ordering=-${order}`;
-    }
-
-    this.service.getAll(params).subscribe( (res: any) => {
-      this.data = new MatTableDataSource<any>(res.results);
-    })
+    this._filters['page'] = event.pageIndex + 1;
+    this.applyFilters();
   }
 
+
+  // Edit Mode
   switchEditMode(){
     if(this.editMode == true){
       this.displayedColumns.splice(this.displayedColumns.indexOf('select'), 1);
@@ -149,7 +143,6 @@ export class TableComponent implements OnInit, AfterViewInit {
       this.selection.clear();
       return;
     }
-
     this.selection.select(...this.data.data);
   }
 
@@ -157,34 +150,40 @@ export class TableComponent implements OnInit, AfterViewInit {
     return (this.showEdit || this.showDelete || this.showView);
   }
 
-  addItem(){
-    // this.router.navigate([this.baseUrl, 'nuevo'], { });
+
+  // Events
+  onClickAddItem(){
     this.emitCreate.emit(-1);
   }
 
-  viewItem(id: number){
-    this.router.navigate([this.baseUrl, id], { })
+  onClickViewItem(id: number){
+    this.emitView.emit(id);
   }
 
-  editItem(id: number){
-    // let url = this.baseUrl + "/editar"
-    // this.router.navigate([url, id], { })
+  onClickEditItem(id: number){
     this.emitEdit.emit(id);
   }
 
-  deleteItem(id: number){
-    if (confirm("Esta acción es irreversible, ¿de verdad querés eliminar esto?")){
-      this.emitDelete.emit(id);
-    }
+  onClickDeleteItem(id: number){
+    this.snackSvc.confirm('¿Desea eliminar esto?').subscribe(res=>{
+      if(res===true){
+        this.emitDelete.emit(id);
+      }
+    })
   }
 
   bulkDelete(){
     let selection = this.selection.selected;
-    if(selection.length > 0 && confirm(`Esta acción es irreversible, ¿de verdad querés eliminar ${selection.length} registros?`)){
-      for (let item of selection){
-        this.emitDelete.emit(item.id);
-      }
-    }
+    if(selection.length){
+      this.snackSvc.confirm(`Esta acción es irreversible, ¿de verdad querés eliminar ${selection.length} registros?`).subscribe(res=>{
+        console.log(res)
+        if (res === true){
+          for (let item of selection){
+            this.emitDelete.emit(item.id);
+          }   
+        }
+      })
+    } 
   }
 
 }

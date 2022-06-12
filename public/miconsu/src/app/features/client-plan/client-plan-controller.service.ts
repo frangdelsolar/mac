@@ -19,7 +19,7 @@ export class ClientPlanService {
     return this.adminSvc.get<PaginatedResponse>(url, null, true);
   }
 
-  public search(params: string ){
+  public filter(params: string ){
     let url = this._apiUrl;
     url += params;
     return this.adminSvc.get<PaginatedResponse>(url, null, true);

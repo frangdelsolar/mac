@@ -10,6 +10,7 @@ export class DialogService {
 
     private DataObservable: BehaviorSubject<DialogData> = new BehaviorSubject<DialogData>({component: CardComponent, params: {}});
     private ShowObservable: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    private hasClosed: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     
     constructor( ) {}
 
@@ -25,6 +26,10 @@ export class DialogService {
         return this.DataObservable.asObservable()
     }
 
+    get hasClosedObservable(): Observable<boolean> {
+        return this.hasClosed.asObservable()
+    }
+    
     public show(data: DialogData){
         this.DataObservable.next(data);
         this.DialogShow();
@@ -32,6 +37,10 @@ export class DialogService {
 
     public close(){
         this.ShowObservable.next(false);
+    }
+
+    public announceClose(){
+        this.hasClosed.next(true);
     }
 
 }

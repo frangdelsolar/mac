@@ -1,13 +1,13 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from client.models import Client, ClientType, ClientPlan
 from client.api.serializers import ClientTypeSerializer, ClientPlanSerializer, ClientSerializer
 from utils.authentication.get_profile_and_roles import get_profile_and_roles
+from utils.filter_queryset import filter_queryset
 from django.contrib.auth import get_user_model 
 from users.enum import UserRoles
 from decorators.user_has_client import user_has_client
-from django.db.models import ProtectedError
 from rest_framework.pagination import PageNumberPagination
 
 User = get_user_model()
@@ -21,12 +21,17 @@ class ClientTypeViewSet(viewsets.ModelViewSet):
 class ClientPlanViewSet(viewsets.ModelViewSet):
     queryset = ClientPlan.objects.none()
     serializer_class = ClientPlanSerializer
+    search_fields = ['id', 'name']
+    ordering_fields = ['id', 'name']
 
     @user_has_client
     def list(self, request):
         self.queryset = ClientPlan.objects.all()
-        serializer = self.serializer_class(self.queryset, many=True)
+        filtered_qs = filter_queryset(self.search_fields, self.queryset, request)
+        ord_qs = filtered_qs.order_by(*request.GET.getlist('ordering'))
+        serializer = self.serializer_class(ord_qs, many=True)
         paginator = PageNumberPagination()
+
         page = paginator.paginate_queryset(serializer.data, request)
         if page is not None:
             return paginator.get_paginated_response(page)
