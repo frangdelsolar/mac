@@ -8,12 +8,14 @@ import { RouterModule } from '@angular/router';
 import { FeaturesModule } from '@features/features.module';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedModule } from '@shared/shared.module';
+import { AppAdministratorModule } from './layouts/app-administrator/app-administrator.module';
 
 @NgModule({
   declarations: [
     AppComponent,
   ],
   imports: [
+    AppAdministratorModule,
     AppRoutingModule,
     BrowserModule,
     BrowserAnimationsModule,
