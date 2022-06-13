@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DialogData } from '@core/models/dialog.interface';
 import { DialogService } from '@core/services/dialog.service';
 import { ClientPlanService } from '../client-plan-controller.service';
@@ -7,40 +8,37 @@ import { clientPlanEnum } from '../client-plan.enum';
 import { ClientPlan } from '../client-plan.interface';
 
 @Component({
-  selector: 'app-client-plan-detail',
-  templateUrl: './client-plan-detail.component.html',
-  styleUrls: ['./client-plan-detail.component.scss']
+  selector: 'app-client-plan-modal',
+  templateUrl: './client-plan-modal.component.html',
+  styleUrls: ['./client-plan-modal.component.scss']
 })
-export class ClientPlanDetailComponent implements OnInit {
+export class ClientPlanModalComponent implements OnInit {
   header: string = "Plan de Servicios";
   subheader: string = "Detalle";
-  buttons = [
-    {
-      label: 'Editar',
-      callback: this.onClickEditItem.bind(this)
-    },
-  ];
 
-  @Input() objectId!: number;
+  @Input() objectId = null;
 
   object!: ClientPlan;
   labels = clientPlanEnum;
   constructor(
     private service: ClientPlanService,
     private dialogSvc: DialogService,
+    @Inject(MAT_DIALOG_DATA) public dialogData: any
   ) { }
 
   ngOnInit(): void {
-    this.service.getById(this.objectId).subscribe(item=>{
-      this.object=item;
-    })
+    let id = this.dialogData['id'];
+    if (id){
+      this.service.getById(id).subscribe(item=>{
+        this.object=item;
+      })
+    }
   }
 
-
-  public onClickEditItem(){
+  onClickEditItem(){
     let dialogData: DialogData = {
       component: ClientPlanFormComponent,
-      params: {'id': this.objectId}
+      params: {'id': this.object.id}
     }
     this.dialogSvc.show(dialogData);
     this.dialogSvc.hasClosedObservable.subscribe(res=>{
@@ -49,4 +47,5 @@ export class ClientPlanDetailComponent implements OnInit {
       }
     })
   }
+
 }

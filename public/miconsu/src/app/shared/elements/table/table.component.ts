@@ -176,7 +176,6 @@ export class TableComponent implements OnInit, AfterViewInit {
     let selection = this.selection.selected;
     if(selection.length){
       this.snackSvc.confirm(`Esta acción es irreversible, ¿de verdad querés eliminar ${selection.length} registros?`).subscribe(res=>{
-        console.log(res)
         if (res === true){
           for (let item of selection){
             this.emitDelete.emit(item.id);

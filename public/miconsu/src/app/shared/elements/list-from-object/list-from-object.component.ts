@@ -14,9 +14,11 @@ export class ListFromObjectComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+
   }
 
   ngOnChanges() {
+    this.items=[];
     if(this.object) {
       for (let key in this.object){
         this.items.push({'key': this.labels[key], 'value': this.object[key]})

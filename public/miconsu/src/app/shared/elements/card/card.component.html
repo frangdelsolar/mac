@@ -4,6 +4,6 @@
     {{body}}
     <ng-content></ng-content>
     <mat-card-actions align="end">
-        <button mat-button [routerLink]="link">Ver</button>
+        <button mat-button *ngFor="let button of buttons" (click)="button.callback()">{{button.label}}</button>
     </mat-card-actions>
 </mat-card>

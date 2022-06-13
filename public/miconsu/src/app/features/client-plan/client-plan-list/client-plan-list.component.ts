@@ -3,10 +3,9 @@ import { DialogData } from '@core/models/dialog.interface';
 import { DialogService } from '@core/services/dialog.service';
 import { SnackbarService } from '@core/services/snackbar.service';
 import { TableService } from '@shared/elements/table/table.service';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { ClientPlanService } from '../client-plan-controller.service';
-import { ClientPlanDetailComponent } from '../client-plan-detail/client-plan-detail.component';
 import { ClientPlanFormComponent } from '../client-plan-form/client-plan-form.component';
+import { ClientPlanModalComponent } from '../client-plan-modal/client-plan-modal.component';
 import { ClientPlan } from '../client-plan.interface';
 
 @Component({
@@ -53,10 +52,15 @@ export class ClientPlanListComponent implements OnInit {
 
   viewItem(id: number){
     let dialogData: DialogData = {
-      component: ClientPlanDetailComponent,
+      component: ClientPlanModalComponent,
       params: {'id': id}
     }
     this.dialogSvc.show(dialogData);
+    this.dialogSvc.hasClosedObservable.subscribe(res=>{
+      if(res){
+        this.ngOnInit();
+      }
+    })
   }
 
   addItem(){
