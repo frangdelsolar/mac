@@ -6,6 +6,7 @@ omit =
         */usr/local/lib*
         */__init__.py
         */migrations/*
+        */test/*
 
 
 [report]
@@ -14,3 +15,5 @@ omit =
         */usr/local/lib*
         */__init__.py
         */migrations/*
+        */test/*
+
