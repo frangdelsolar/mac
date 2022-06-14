@@ -2,10 +2,13 @@
   <mat-card-title>{{tableHeader}}</mat-card-title>
   <mat-card-subtitle>{{tableSubHeader}}</mat-card-subtitle>
 
-  <mat-form-field appearance="standard">
-    <mat-label>Buscar</mat-label>
-    <input matInput [formControl]="searchControl" (keyup)="searchChanged()" placeholder="Ej: palabra" #input>
-  </mat-form-field>
+  <div align="end">
+    <mat-form-field appearance="standard">
+      <mat-label>Buscar</mat-label>
+      <input matInput [formControl]="searchControl" (keyup)="searchChanged()" placeholder="Ej: palabra" #input>
+    </mat-form-field>
+  </div>
+
 
   <table mat-table [dataSource]="data" class="mat-elevation-z8 demo-table" matSort (matSortChange)="announceSortChange($event)">
 

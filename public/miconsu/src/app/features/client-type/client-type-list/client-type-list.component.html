@@ -1,0 +1,10 @@
+<app-table
+    [tableHeader]="header"
+    [tableSubHeader]="subheader"
+    [columns]="columns"
+    (emitFilter)="applyFilter($event)"
+    (emitView)="viewItem($event)"
+    (emitCreate)="addItem()"
+    (emitEdit)="editItem($event)"
+    (emitDelete)="deleteItem($event)"
+></app-table>

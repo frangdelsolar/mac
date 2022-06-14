@@ -14,8 +14,93 @@ User = get_user_model()
 
 
 class ClientTypeViewSet(viewsets.ModelViewSet):
-    queryset = ClientType.objects.all()
+    queryset = ClientType.objects.none()
     serializer_class = ClientTypeSerializer
+    search_fields = ['id', 'name']
+    ordering_fields = ['id', 'name']
+
+    @user_has_client
+    def list(self, request):
+        self.queryset = ClientType.objects.all()
+        filtered_qs = filter_queryset(self.search_fields, self.queryset, request)
+        ord_qs = filtered_qs.order_by(*request.GET.getlist('ordering'))
+        serializer = self.serializer_class(ord_qs, many=True)
+        paginator = PageNumberPagination()
+
+        page = paginator.paginate_queryset(serializer.data, request)
+        if page is not None:
+            return paginator.get_paginated_response(page)
+        return Response(serializer.data)
+
+    @user_has_client
+    def create(self, request): 
+        profile, user_roles = get_profile_and_roles(request)
+
+        if not UserRoles.APP_ADMINISTRATOR.value in user_roles:
+            return Response(data={'Error': 'El usuario no tiene permiso de realizar esta acción'}, status=403)
+
+        name = request.data.get('name')
+        if not name:
+            return Response(data={'Error': 'Faltan datos para proceder con el registro'}, status=500)
+
+        serializer = ClientTypeSerializer(data = {'name': name})
+        serializer_is_valid = serializer.is_valid()
+        if not serializer_is_valid:
+            return Response(data={'Error': 'Los datos no son válidos'}, status=500)
+
+        instance = serializer.save()
+        return Response(ClientTypeSerializer(instance).data)
+
+    @user_has_client
+    def retrieve(self, request, pk=None):    
+        profile, user_roles = get_profile_and_roles(request)
+
+        filtered_clients = ClientType.objects.filter(id=pk)
+        if filtered_clients.count() <= 0:
+            return Response(data={'Error': 'Plan de servicios inexistente'}, status=500)
+
+        instance = filtered_clients.last()
+        serializer = self.serializer_class(instance)
+
+        return Response(serializer.data)
+
+
+    @user_has_client
+    def update(self, request, pk=None):
+        profile, user_roles = get_profile_and_roles(request)
+
+        if not UserRoles.APP_ADMINISTRATOR.value in user_roles:
+            return Response(data={'Error': 'El usuario no tiene permiso para actualizar este objeto'}, status=403)
+
+        filtered_clients = ClientType.objects.filter(id=pk)
+        if filtered_clients.count() <= 0:
+            return Response(data={'Error': 'Objeto inexistente'}, status=500)
+
+        instance = filtered_clients.last()
+
+        name = request.data.get('name')
+        if name:
+            instance.name = name
+        instance.save()
+
+        serializer = self.serializer_class(instance)
+        return Response(serializer.data)
+
+    @user_has_client
+    def destroy(self, request, pk=None):
+        profile, user_roles = get_profile_and_roles(request)
+
+        if not UserRoles.APP_ADMINISTRATOR.value in user_roles:
+            return Response(data={'Error': 'El usuario no tiene permiso para eliminar este objeto'}, status=403)
+
+        filtered_clients = ClientType.objects.filter(id=pk)
+        if filtered_clients.count() <= 0:
+            return Response(data={'Error': 'Objeto inexistente'}, status=500)
+
+        instance = filtered_clients.last()
+        instance.delete()
+
+        return Response(data={'Success': 'Objeto eliminado de manera exitosa'}, status=200)
 
 
 class ClientPlanViewSet(viewsets.ModelViewSet):
@@ -104,7 +189,6 @@ class ClientPlanViewSet(viewsets.ModelViewSet):
 
         instance = filtered_clients.last()
         instance.delete()
-
 
         return Response(data={'Success': 'Objeto eliminado de manera exitosa'}, status=200)
         

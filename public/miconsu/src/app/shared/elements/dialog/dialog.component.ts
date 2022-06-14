@@ -39,7 +39,7 @@ export class DialogComponent implements OnInit {
 
   openDialog() {
     let data = { 
-      width: '50vw',
+      width: '25vw',
       data: this.data.params 
     };
     let dialogRef = this.dialog.open(this.data.component, data )

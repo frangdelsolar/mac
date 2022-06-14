@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { CrudComponent } from './crud/crud.component';
 import { ClientPlanListComponent } from '@features/client-plan/client-plan-list/client-plan-list.component';
+import { ClientTypeListComponent } from '@features/client-type/client-type-list/client-type-list.component';
 
 const routes: Routes = [
   {
@@ -12,6 +13,10 @@ const routes: Routes = [
       {
         path: "plan",
         component: ClientPlanListComponent
+      },
+      {
+        path: "tipo-de-cliente",
+        component: ClientTypeListComponent
       },
     ]
   },

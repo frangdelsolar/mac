@@ -1,0 +1,23 @@
+<app-form
+  [header]="header"
+  [subheader]="subheader"
+  (submitEmitter)="onSubmit($event)"
+  (clearEmitter)="onClearForm($event)"
+  >
+  
+  <form [formGroup]="form" id="ngForm">
+
+    <mat-form-field  appearance="fill">
+      <mat-label>Nombre</mat-label>
+      <input matInput [formControl]="nameControl">
+      <mat-error *ngIf="!nameControl.hasError('minLength')">
+        El nombre debe tener al menos tres caracteres.
+      </mat-error>
+      <mat-error *ngIf="nameControl.hasError('required')">
+        El nombre es <strong>obligatorio</strong>.
+      </mat-error>
+    </mat-form-field>
+
+  </form>
+
+</app-form>

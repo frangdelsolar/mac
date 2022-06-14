@@ -27,6 +27,7 @@ export class SnackbarService {
         snackRef.onAction().subscribe(()=>{
             this.obs.next(true);
         });
+        this.obs.next(false);
         return this.obs;
     }
 }
