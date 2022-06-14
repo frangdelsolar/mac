@@ -1,1 +1,64 @@
-<p>client-form works!</p>
+<app-form
+  [header]="header"
+  [subheader]="subheader"
+  (submitEmitter)="onSubmit($event)"
+  (clearEmitter)="onClearForm($event)"
+  >
+  
+  <form [formGroup]="form" id="ngForm">
+
+    <div class="grid">
+      <div class="col">
+        
+        <div class="row">
+          <mat-form-field class="form-field" appearance="fill">
+            <mat-label>Nombre</mat-label>
+            <input matInput [formControl]="nameControl">
+            <mat-error *ngIf="!nameControl.hasError('minLength') && !nameControl.hasError('required')">
+              El nombre debe tener al menos tres caracteres.
+            </mat-error>
+            <mat-error *ngIf="nameControl.hasError('required')">
+              El nombre es <strong>obligatorio</strong>.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- <div class="row">
+          <mat-form-field appearance="fill">
+            <mat-label>Administrador</mat-label>
+            <mat-select [formControl]='administratorControl' name="referrer">
+              <mat-option *ngFor="let item of userData" [value]="item.id">
+                {{item.username}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div> -->
+
+        <div class="row">
+          <mat-form-field appearance="fill">
+            <mat-label>Tipo de cliente</mat-label>
+            <mat-select [formControl]='clientTypeControl' name="referrer">
+              <mat-option *ngFor="let item of clientTypeData" [value]="item.id">
+                {{item.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field appearance="fill">
+            <mat-label>Plan de servicios</mat-label>
+            <mat-select [formControl]='clientPlanControl' name="referrer">
+              <mat-option *ngFor="let item of clientPlanData" [value]="item.id">
+                {{item.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+      </div>
+    </div>
+
+  </form>
+
+</app-form>

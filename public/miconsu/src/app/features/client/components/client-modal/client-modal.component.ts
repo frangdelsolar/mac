@@ -1,5 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ButtonInterface } from '@core/models/button.interface';
+import { Component, Inject, Input, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DialogData } from '@core/models/dialog.interface';
 import { DialogService } from '@core/services/dialog.service';
 import { clientPlanEnum } from '@features/client-plan/client-plan.enum';
@@ -8,40 +8,37 @@ import { Client } from '@features/client/client.interface';
 import { ClientFormComponent } from '../client-form/client-form.component';
 
 @Component({
-  selector: 'app-client-detail',
-  templateUrl: './client-detail.component.html',
-  styleUrls: ['./client-detail.component.scss']
+  selector: 'app-client-modal',
+  templateUrl: './client-modal.component.html',
+  styleUrls: ['./client-modal.component.scss']
 })
-export class ClientDetailComponent implements OnInit {
+export class ClientModalComponent implements OnInit {
   header: string = "Cliente";
   subheader: string = "Detalle";
-  buttons: ButtonInterface[] = [
-    {
-      label: 'Editar',
-      callback: this.onClickEditItem.bind(this)
-    },
-  ];
 
-  @Input() objectId!: number;
+  @Input() objectId = null;
 
   object!: Client;
   labels = clientPlanEnum;
   constructor(
     private service: ClientService,
     private dialogSvc: DialogService,
+    @Inject(MAT_DIALOG_DATA) public dialogData: any
   ) { }
 
   ngOnInit(): void {
-    this.service.getById(this.objectId).subscribe(item=>{
-      this.object=item;
-    })
+    let id = this.dialogData['id'];
+    if (id){
+      this.service.getById(id).subscribe(item=>{
+        this.object=item;
+      })
+    }
   }
 
-
-  public onClickEditItem(){
+  onClickEditItem(){
     let dialogData: DialogData = {
       component: ClientFormComponent,
-      params: {'id': this.objectId}
+      params: {'id': this.object.id}
     }
     this.dialogSvc.show(dialogData);
     this.dialogSvc.hasClosedObservable.subscribe(res=>{
@@ -50,4 +47,5 @@ export class ClientDetailComponent implements OnInit {
       }
     })
   }
+
 }

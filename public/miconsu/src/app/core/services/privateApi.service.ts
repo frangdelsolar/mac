@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
+import { SnackbarService } from "./snackbar.service";
 
 
 @Injectable({
@@ -9,7 +10,9 @@ import { Observable } from "rxjs";
 export class PrivateApiService {
   private _headers!: HttpHeaders;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+    private snackSvc: SnackbarService,
+    ) {
     let token = localStorage.getItem('access');
     if (token) {
       token = `Bearer ${token}`;
@@ -34,7 +37,7 @@ export class PrivateApiService {
       url, 
       body, 
       activateHeader ? { headers: this._headers } : {}
-      );
+      )
   }
 
   public put<T>(url: string, body: any, id: number, activateHeader: boolean = true): Observable<T> {

@@ -2,10 +2,10 @@
   <mat-card-title>{{tableHeader}}</mat-card-title>
   <mat-card-subtitle>{{tableSubHeader}}</mat-card-subtitle>
 
-  <div align="end">
+  <div style="margin-top: -40px;" align="end">
     <mat-form-field appearance="standard">
       <mat-label>Buscar</mat-label>
-      <input matInput [formControl]="searchControl" (keyup)="searchChanged()" placeholder="Ej: palabra" #input>
+      <input matInput [formControl]="searchControl" (keyup)="searchChanged()" placeholder="Ej: Nombre" #input>
     </mat-form-field>
   </div>
 

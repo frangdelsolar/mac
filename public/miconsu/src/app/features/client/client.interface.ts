@@ -1,12 +1,12 @@
-// import { ClientPlan } from "./client-plan.interface";
-// import { ClientType } from "./client-type.interface";
-// import { User } from "./user.interface";
+import { ClientPlan } from "@features/client-plan/client-plan.interface";
+import { ClientType } from "@features/client-type/client-type.interface";
+import { User } from "@features/user/user.interface";
 
 
 export interface Client {
     id: number;
     name: string
-    administrator?: any;
-    client_plan?: any;
-    client_type?: any;
+    administrator?: User;
+    client_plan?: ClientPlan;
+    client_type?: ClientType;
 }

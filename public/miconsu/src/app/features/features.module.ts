@@ -6,7 +6,7 @@ import { ClientTypeModule } from './client-type/client-type.module';
 
 
 const myModules = [
-  ClientModule,
+  // ClientModule,
   ClientPlanModule,
   ClientTypeModule
 ]
