@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { ButtonInterface } from '@core/models/button.interface';
 import { DialogData } from '@core/models/dialog.interface';
 import { DialogService } from '@core/services/dialog.service';
 import { ClientPlanService } from '../client-plan-controller.service';
@@ -14,7 +15,7 @@ import { ClientPlan } from '../client-plan.interface';
 export class ClientPlanDetailComponent implements OnInit {
   header: string = "Plan de Servicios";
   subheader: string = "Detalle";
-  buttons = [
+  buttons: ButtonInterface[] = [
     {
       label: 'Editar',
       callback: this.onClickEditItem.bind(this)

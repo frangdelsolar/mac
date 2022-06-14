@@ -39,10 +39,9 @@ export class CrudComponent implements OnInit {
       "link": "profesional/",
     },
   ]
-  
+
   constructor() { }
 
   ngOnInit(): void {
   }
-
 }
