@@ -1,9 +1,14 @@
-<div class="row" *ngFor="let section of this.sections">
-    <app-card 
-        [header]="section.title"
-        [subheader]="section.description"
-        [link]="section.link"
-    ></app-card>
+<div class="grid">
+    <div class="col-4">
+        <div class="card" *ngFor="let section of this.sections">
+            <app-card 
+                [header]="section.title"
+                [subheader]="section.description"
+                [link]="section.link"
+            ></app-card>
+        </div>
+    </div>
+    <div class="col">
+            <router-outlet></router-outlet>
+    </div>
 </div>
-
-<router-outlet></router-outlet>
