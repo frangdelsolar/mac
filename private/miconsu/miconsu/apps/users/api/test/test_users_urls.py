@@ -1,11 +1,7 @@
-from django.test import TestCase
 from rest_framework.test import APITestCase
-from rest_framework.test import APIClient, APIRequestFactory, force_authenticate
+from rest_framework.test import APIRequestFactory, force_authenticate
 from users.api.views import UserViewSet
 from django.contrib.auth import get_user_model 
-from users.enum import UserRoles
-from users.models import Profile
-from collections import OrderedDict
 
 
 User = get_user_model()

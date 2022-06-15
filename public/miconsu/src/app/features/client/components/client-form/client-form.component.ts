@@ -10,6 +10,7 @@ import { ClientPlan } from '@features/client-plan/client-plan.interface';
 import { ClientType } from '@features/client-type/client-type.interface';
 import { ClientPlanService } from '@features/client-plan/client-plan-controller.service';
 import { ClientTypeService } from '@features/client-type/client-type-controller.service';
+import { UserService } from '@features/user/user.service';
 
 
 @Component({
@@ -36,6 +37,7 @@ export class ClientFormComponent implements OnInit {
     private modelSVc: ClientService,
     private clientPlanSvc: ClientPlanService,
     private clientTypeSvc: ClientTypeService,
+    private userSvc: UserService,
     private snackSvc: SnackbarService,
     private dialogSvc: DialogService,
     @Inject(MAT_DIALOG_DATA) public dialogData: any 
@@ -60,9 +62,9 @@ export class ClientFormComponent implements OnInit {
           this.form.get('administrator_id')?.disable();
           this.form.get('client_plan_id')?.disable();
           this.form.get('client_type_id')?.disable();
+          this.loadUsers(item.administrator?.id);
           this.loadClientPlans(item.client_plan?.id);
           this.loadClientTypes(item.client_type?.id);
-          this.loadUsers(item.administrator?.id);
         })
     } else {
       this.loadUsers(null);
@@ -96,15 +98,15 @@ export class ClientFormComponent implements OnInit {
   }
 
   loadUsers(id: number | null | undefined){
-    // if (id){
-    //   this.clientTypeSvc.getById(id).subscribe(res => {
-    //     this.clientTypeData = [res]
-    //   });
-    // } else {
-    //   this.clientTypeSvc.filter("?limit=99999").subscribe(res => {
-    //     this.clientTypeData = res.results
-    //   });   
-    // }
+    if (id){
+      this.userSvc.getById(id).subscribe(res => {
+        this.userData = [res]
+      });
+    } else {
+      this.userSvc.filter("?limit=99999").subscribe(res => {
+        this.userData = res.results
+      });   
+    }
   }
 
   onSubmit(event: boolean){
