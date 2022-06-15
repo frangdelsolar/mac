@@ -23,7 +23,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 class UserSerializer(HyperlinkedModelSerializer):
-    # roles = SerializerMethodField()
+    roles = SerializerMethodField()
     class Meta:
         model = User
         fields = [
@@ -32,11 +32,29 @@ class UserSerializer(HyperlinkedModelSerializer):
             'first_name', 
             'last_name', 
             'email',
-            # 'roles'
+            'roles'
         ]
 
-    # def get_roles(self, obj):
-    #     groups = []
-    #     for group in obj.groups.all():
-    #         groups.append(group.name)
-    #     return groups
+    def get_roles(self, obj):
+        groups = []
+        for group in obj.groups.all():
+            groups.append(group.name)
+        return groups
+
+
+class ProfileSerializer(HyperlinkedModelSerializer):
+    user = SerializerMethodField()
+    # person = SerializerMethodField()
+    
+    class Meta:
+        model = Profile
+        fields = [
+            'user',
+            # 'person',
+        ]
+
+    def get_user(self, obj):
+        return UserSerializer(obj.user).data
+
+    # def get_person(self, obj):
+    #     return PersonSerializer(obj.person).data
