@@ -89,9 +89,9 @@ class URLTest(APITestCase):
         force_authenticate(post_request, user=self.app_admin)
         response = self.create_view(post_request)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, {'id': 5, 'name': 'Novo Cliente', 'administrator': OrderedDict([('id', 1), ('username', 'admin'), ('first_name', 'Super'), ('last_name', 'Admin'), ('email', 'super@admin.com')]), 'client_plan': OrderedDict([('id', 2), ('name', 'Suscripción Mensual')]), 'client_type': OrderedDict([('id', 2), ('name', 'Professional')])})
+        self.assertEqual(response.data, {'id': 5, 'name': 'Novo Cliente', 'administrator': OrderedDict([('id', 1), ('username', 'admin'), ('first_name', 'Super'), ('last_name', 'Admin'), ('email', 'super@admin.com'), ('roles', [])]), 'client_plan': OrderedDict([('id', 2), ('name', 'Suscripción Mensual')]), 'client_type': OrderedDict([('id', 2), ('name', 'Professional')])})
 
-    
+
     def test_detail__403__not_authenticated(self):
         """Detail View should not be available for Anonymous user"""
         response = self.detail_view(self.get_request, Client.objects.last().id)
