@@ -1,5 +1,7 @@
 <div class="grid">
     <div class="col-4">
+        <button mat-flat-button color="primary" (click)="onRegisterClientClick()">Alta Cliente</button>
+
         <div class="card" *ngFor="let section of this.sections">
             <app-card 
                 [header]="section.title"

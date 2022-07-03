@@ -1,0 +1,92 @@
+<div class="container">
+  <div class="header">
+    <div class="title">
+      <h2>{{ header }}</h2>
+    </div>
+    <div class="subtitle">
+      <p>{{ subheader }}</p>
+    </div>
+  </div>
+
+  <mat-stepper orientation="vertical" linear>
+    <mat-step [stepControl]="stepOneForm">
+      <ng-template matStepLabel>Tipo de cliente</ng-template>
+      <form [formGroup]="stepOneForm" id="ngForm">
+        <div class="row">
+          <mat-form-field appearance="fill">
+            <mat-label>Tipo de cliente</mat-label>
+            <mat-select formControlName="client_type_id">
+              <mat-option *ngFor="let item of clientTypeData" [value]="item.id">
+                {{ item.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field appearance="fill">
+            <mat-label>Plan de servicios</mat-label>
+            <mat-select formControlName="client_plan_id">
+              <mat-option *ngFor="let item of clientPlanData" [value]="item.id">
+                {{ item.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <button
+            mat-button
+            matStepperNext
+            type="button"
+            (click)="onClientTypeSelection()"
+          >
+            Siguiente
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="stepTwoForm">
+      <ng-template matStepLabel>Usuario Administrador</ng-template>
+      <form [formGroup]="stepTwoForm" id="ngForm">
+        <div class="row">
+          <mat-form-field class="form-field" appearance="fill">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="first_name" />
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field class="form-field" appearance="fill">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="last_name" />
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field class="form-field" appearance="fill">
+            <mat-label>Nombre de usuario</mat-label>
+            <input matInput formControlName="username" />
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field class="form-field" appearance="fill">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" />
+          </mat-form-field>
+        </div>
+
+        <div>
+          <button mat-button matStepperBack type="button">Anterior</button>
+          <button mat-button matStepperNext type="button">Siguiente</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="stepThreeForm">
+      <ng-template matStepLabel>Profesional u Organizacion</ng-template>
+    </mat-step>
+  </mat-stepper>
+</div>

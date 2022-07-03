@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { DialogData } from '@core/models/dialog.interface';
+import { DialogService } from '@core/services/dialog.service';
+import { RegisterClientComponent } from '../register-client/register-client.component';
 
 @Component({
   selector: 'app-crud',
@@ -40,8 +43,24 @@ export class CrudComponent implements OnInit {
     },
   ]
 
-  constructor() { }
+  constructor(
+    private dialogSvc: DialogService,
+  ) { }
 
   ngOnInit(): void {
+  }
+
+  onRegisterClientClick(){
+    let dialogData: DialogData = {
+      component: RegisterClientComponent,
+      params: {}
+    }
+    this.dialogSvc.show(dialogData);
+    this.dialogSvc.hasClosedObservable.subscribe(res=>{
+      if(res){
+        this.ngOnInit();
+      }
+    })
+
   }
 }

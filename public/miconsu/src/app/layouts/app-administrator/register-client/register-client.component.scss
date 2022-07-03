@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.header {
+  margin-bottom: 15px;
+}
+
+.footer {
+  margin-top: 25px;
+}
+
+.title {
+  line-height: 2px;
+  h2 {
+    font-size: x-large;
+    line-height: 2px;
+  }
+}
+
+.subtitle {
+  margin-top: 0px;
+  color: rgba(0, 0, 0, 0.54);
+}
