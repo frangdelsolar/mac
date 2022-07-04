@@ -46,9 +46,11 @@ INSTALLED_APPS = [
     'client',
     'metadata',
     'person',
-    'professional',
     'users',
-    'utils'
+
+    'utils',
+    'professional',
+
 ]
 
 MIDDLEWARE = [

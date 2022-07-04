@@ -8,6 +8,9 @@ from utils.authentication.get_profile_and_roles import get_profile_and_roles
 from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth.models import Group
 from rest_framework.response import Response
+from metadata.models import Metadata
+from users.models import Profile
+from person.models import Person
 
 class ProfessionalViewSet(viewsets.ModelViewSet):
     queryset = Professional.objects.none()
@@ -23,9 +26,9 @@ class ProfessionalViewSet(viewsets.ModelViewSet):
         if UserRoles.APP_ADMINISTRATOR.value in user_roles:
             self.queryset = Professional.objects.all()
         elif UserRoles.ORGANIZATION_ADMINISTRATOR.value in user_roles:
-            self.queryset = Professional.objects.filter(client=request.user_set.client)
+            self.queryset = Professional.objects.filter(metadata__client=profile.client)
         elif UserRoles.PROFESSIONAL.value in user_roles:
-            self.queryset = Professional.objects.filter(client=request.user_set.client)
+            self.queryset = Professional.objects.filter(metadata__client=profile.client)
 
         filtered_qs = filter_queryset(self.search_fields, self.queryset, request)
         ordered_qs = filtered_qs.order_by(*request.GET.getlist('ordering'))
@@ -41,47 +44,44 @@ class ProfessionalViewSet(viewsets.ModelViewSet):
     def create(self, request): 
         profile, user_roles = get_profile_and_roles(request)
 
-        if not UserRoles.APP_ADMINISTRATOR.value in user_roles:
+        if not (UserRoles.APP_ADMINISTRATOR.value in user_roles or UserRoles.ORGANIZATION_ADMINISTRATOR.value in user_roles):
             return Response(data={'error': 'El usuario no tiene permiso de realizar esta acción'}, status=403)
 
-        username = request.data.get('username')
-        first_name = request.data.get('first_name')
-        last_name = request.data.get('last_name')
-        email = request.data.get('email')
-        roles = request.data.get('roles')
-        if not username:
+        prof_profile = request.data.get('profile_id')
+        prof_contact = request.data.get('contact_id')
+        if not (prof_profile and prof_contact):
             return Response(data={'error': 'Faltan datos para proceder con el registro'}, status=500)
 
-        serializer = UserSerializer(data = {
-                'username': username,
-                'first_name': first_name,
-                'last_name': last_name,
-                'email': email,
-            })
-        serializer_is_valid = serializer.is_valid()
-        if not serializer_is_valid:
-            return Response(data={'error': 'Los datos no son válidos'}, status=500)
+        metadata = Metadata.objects.create(
+            client = profile.client,
+            created_by= request.user,
+        )
 
-        instance = serializer.save()
-        for role in roles:
-            group = Group.objects.get(name=role)
-            instance.groups.add(group)
-        instance.save()
-        return Response(UserSerializer(instance).data)
+        prof_profile_filter = Profile.objects.filter(user=prof_profile)
+        prof_contact_filter = Person.objects.filter(id=prof_contact)
+        if prof_profile_filter.count() <= 0 or prof_contact_filter.count() <= 0:
+             return Response(data={'error': 'Datos erróneos'}, status=500)
+
+        instance = Professional.objects.create(
+            profile = prof_profile_filter.last(),
+            contact = prof_contact_filter.last()
+        )
+
+        return Response(ProfessionalSerializer(instance).data)
 
     @user_has_client
     def retrieve(self, request, pk=None):    
         profile, user_roles = get_profile_and_roles(request)
 
-        if not (UserRoles.APP_ADMINISTRATOR.value in user_roles or
-            request.user.id == pk):
-            return Response(data={'error': 'El usuario no tiene permiso de realizar esta acción'}, status=403)
-
-        filtered_objects = User.objects.filter(id=pk)
+        filtered_objects = Professional.objects.filter(id=pk)
         if filtered_objects.count() <= 0:
             return Response(data={'error': 'Objeto inexistente'}, status=500)
 
         instance = filtered_objects.last()
+        if not (UserRoles.APP_ADMINISTRATOR.value in user_roles or
+                profile.client == instance.metadata.client):
+            return Response(data={'error': 'El usuario no tiene permiso de realizar esta acción'}, status=403)
+
         serializer = self.serializer_class(instance)
 
         return Response(serializer.data)
@@ -91,32 +91,20 @@ class ProfessionalViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         profile, user_roles = get_profile_and_roles(request)
 
-        if not (UserRoles.APP_ADMINISTRATOR.value in user_roles or
-                request.user.id == pk):
-            return Response(data={'error': 'El usuario no tiene permiso para actualizar este objeto'}, status=403)
-
-        filtered_objects = User.objects.filter(id=pk)
+        filtered_objects = Professional.objects.filter(id=pk)
         if filtered_objects.count() <= 0:
             return Response(data={'error': 'Objeto inexistente'}, status=500)
 
         instance = filtered_objects.last()
+        if not (UserRoles.APP_ADMINISTRATOR.value in user_roles or
+                profile.client == instance.metadata.client):
+            return Response(data={'error': 'El usuario no tiene permiso de realizar esta acción'}, status=403)
 
-        username = request.data.get('username')
-        first_name = request.data.get('first_name')
-        last_name = request.data.get('last_name')
-        email = request.data.get('email')
-        roles = request.data.get('roles')
+        prof_profile = request.data.get('profile')
+        prof_contact = request.data.get('contact')
 
-        if username: instance.username = username 
-        if first_name: instance.first_name = first_name 
-        if last_name: instance.last_name = last_name 
-        if email: instance.email = email 
-
-        if roles:
-            for role in roles:
-                group = Group.objects.get(name=role)
-                instance.groups.add(group)
-
+        if prof_profile: instance.profile = prof_profile 
+        if prof_contact: instance.contact = prof_contact 
         instance.save()
 
         serializer = self.serializer_class(instance)
@@ -126,14 +114,15 @@ class ProfessionalViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         profile, user_roles = get_profile_and_roles(request)
 
-        if not UserRoles.APP_ADMINISTRATOR.value in user_roles:
-            return Response(data={'error': 'El usuario no tiene permiso para eliminar este objeto'}, status=403)
-
-        filtered_clients = User.objects.filter(id=pk)
-        if filtered_clients.count() <= 0:
+        filtered_objects = Professional.objects.filter(id=pk)
+        if filtered_objects.count() <= 0:
             return Response(data={'error': 'Objeto inexistente'}, status=500)
 
-        instance = filtered_clients.last()
+        instance = filtered_objects.last()
+        if not (UserRoles.APP_ADMINISTRATOR.value in user_roles or
+                profile.client == instance.metadata.client):
+            return Response(data={'error': 'El usuario no tiene permiso de realizar esta acción'}, status=403)
+
         instance.delete()
 
         return Response(data={'Success': 'Objeto eliminado de manera exitosa'}, status=200)
