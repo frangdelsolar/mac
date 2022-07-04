@@ -1,8 +1,8 @@
 from django.db import models
-from metadata.models import Metadata
 
 
-class Professional(Metadata):
+class Professional(models.Model):
+    metadata = models.ForeignKey('metadata.Metadata', blank=True, null=True, on_delete=models.CASCADE)
     profile = models.ForeignKey('users.Profile', blank=True, null=True, on_delete=models.CASCADE, related_name='professional_profile')
     contact = models.ForeignKey('person.Person', on_delete=models.CASCADE, verbose_name='Persona')
     

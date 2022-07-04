@@ -123,7 +123,20 @@ class URLTest(APITestCase):
         response = self.detail_view(request, pk=self.app_admin.id)
         self.assertEqual(response.status_code, 403)
 
-    def test_detail__200__app_administrator__any_user(self):
+    def test_detail__200__same_client_professional__org_admin(self):
+        """Detail View should return self user detail"""
+        force_authenticate(self.get_request, user=self.professional_user)
+        response = self.detail_view(self.get_request, pk=self.professional_user.id)
+        self.assertEqual(response.status_code, 200)
+
+    def test_detail__403__professional_other_client__org_admin(self):
+        """Detail View should not be available for other client"""
+        force_authenticate(self.get_request, user=self.professional_user)
+        request = self.factory.get("")
+        response = self.detail_view(request, pk=self.app_admin.id)
+        self.assertEqual(response.status_code, 403)
+
+    def test_detail__200__any_professional__app_administrator(self):
         """Detail View should return any user if app administrator"""
         force_authenticate(self.get_request, user=self.app_admin)
         response = self.detail_view(self.get_request, pk=self.app_admin.id)
@@ -137,20 +150,25 @@ class URLTest(APITestCase):
         response = self.update_view(self.put_request, pk=4)
         self.assertEqual(response.status_code, 403)
 
-    def test_update__200__self_user(self):
+    def test_update__403__any_professional__professional(self):
         """Update View should be available for self user"""
         force_authenticate(self.put_request, user=self.professional_user)
         response = self.update_view(self.put_request, pk=self.professional_user.id)
         self.assertEqual(response.status_code, 200)
 
-    def test_update__403__other_user(self):
-        """Update View should not be available for other user"""
-        force_authenticate(self.put_request, user=self.professional_user)
-        request = self.factory.get("")
-        response = self.update_view(request, pk=self.app_admin.id)
-        self.assertEqual(response.status_code, 403)
+    def test_update__200__org_administrator__self_client_professional(self):
+        """Update View should return any user if app administrator"""
+        force_authenticate(self.put_request, user=self.app_admin)
+        response = self.update_view(self.put_request, pk=self.professional_user.id)
+        self.assertEqual(response.status_code, 200)
 
-    def test_update__200__app_administrator__any_user(self):
+    def test_update__403__org_administrator__other_client_professional(self):
+        """Update View should return any user if app administrator"""
+        force_authenticate(self.put_request, user=self.app_admin)
+        response = self.update_view(self.put_request, pk=self.professional_user.id)
+        self.assertEqual(response.status_code, 200)
+
+    def test_update__200__app_administrator__any_professional(self):
         """Update View should return any user if app administrator"""
         force_authenticate(self.put_request, user=self.app_admin)
         response = self.update_view(self.put_request, pk=self.professional_user.id)
@@ -199,6 +217,24 @@ class URLTest(APITestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_delete__200__app_admin(self):
+        """Delete View should be available for app admin"""
+        force_authenticate(self.delete_request, user=self.app_admin)
+        response = self.delete_view(self.delete_request, pk=7)
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete__200__org_admin__self_client_professional(self):
+        """Delete View should be available for app admin"""
+        force_authenticate(self.delete_request, user=self.app_admin)
+        response = self.delete_view(self.delete_request, pk=7)
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete__403__org_admin__other_client_professional(self):
+        """Delete View should be available for app admin"""
+        force_authenticate(self.delete_request, user=self.app_admin)
+        response = self.delete_view(self.delete_request, pk=7)
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete__403__professional(self):
         """Delete View should be available for app admin"""
         force_authenticate(self.delete_request, user=self.app_admin)
         response = self.delete_view(self.delete_request, pk=7)
