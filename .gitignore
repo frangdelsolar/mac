@@ -1,5 +1,6 @@
 env/
-
+.vscode
+.angular
 .coveralls.yml
 .coverage
 *htmlcov/*

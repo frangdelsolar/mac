@@ -14,5 +14,5 @@ urlpatterns = [
     path('api/', include('client.api.urls', namespace='client-api')),
     path('api/', include('users.api.urls', namespace='users-api')),
     path('api/', include('person.api.urls', namespace='person-api')),
-    # path('api/', include('professional.api.urls', namespace='professional-api')),
+    path('api/', include('professional.api.urls', namespace='professional-api')),
 ]

@@ -1,0 +1,20 @@
+<div class="container">
+  <div class="header">
+    <div class="title">
+      <h2>{{header}}</h2>
+    </div>
+    <div class="subtitle">
+      <p>{{subheader}}</p>
+    </div>
+  </div>
+
+  <app-list-from-object
+      [object]="object"
+      [labels]="labels"
+  ></app-list-from-object>
+
+  <div class="footer" align=end>
+    <button mat-button (click)="onClickEditItem()" color="primary"> Editar</button>
+  </div>
+
+</div>

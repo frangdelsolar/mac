@@ -52,8 +52,12 @@ class ProfessionalViewSet(viewsets.ModelViewSet):
         if not (prof_profile and prof_contact):
             return Response(data={'error': 'Faltan datos para proceder con el registro'}, status=500)
 
+        prof_client = request.data.get('client_id')
+        if not (prof_client):
+            prof_client = profile.client.id
+
         metadata = Metadata.objects.create(
-            client = profile.client,
+            client_id = prof_client,
             created_by= request.user,
         )
 

@@ -1,0 +1,46 @@
+<app-form
+  [header]="header"
+  [subheader]="subheader"
+  (submitEmitter)="onSubmit($event)"
+  (clearEmitter)="onClearForm($event)"
+  >
+  
+  <form [formGroup]="form" id="ngForm">
+
+    <div class="row">
+      <mat-form-field appearance="fill">
+        <mat-label>Cliente</mat-label>
+        <mat-select formControlName='client_id' name="referrer">
+          <mat-option *ngFor="let item of clientData" [value]="item.id">
+            {{item.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field appearance="fill">
+        <mat-label>Persona</mat-label>
+        <mat-select formControlName='contact_id' name="referrer">
+          <mat-option *ngFor="let item of personData" [value]="item.id">
+            {{item.first_name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field appearance="fill">
+        <mat-label>Perfil de usuario</mat-label>
+        <mat-select formControlName='profile_id' name="referrer">
+          <mat-option *ngFor="let item of profileData" [value]="item.id">
+            {{item.username}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+
+  </form>
+
+</app-form>

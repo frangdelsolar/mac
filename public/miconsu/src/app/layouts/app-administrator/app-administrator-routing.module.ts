@@ -5,6 +5,7 @@ import { CrudComponent } from './crud/crud.component';
 import { ClientPlanListComponent } from '@features/client-plan/client-plan-list/client-plan-list.component';
 import { ClientTypeListComponent } from '@features/client-type/client-type-list/client-type-list.component';
 import { ClientListComponent } from '@features/client/components/client-list/client-list.component';
+import { ProfessionalListComponent } from '@features/professional/professional-list/professional-list.component';
 
 const routes: Routes = [
   {
@@ -22,6 +23,10 @@ const routes: Routes = [
       {
         path: "tipo-de-cliente",
         component: ClientTypeListComponent
+      },
+      {
+        path: "profesional",
+        component: ProfessionalListComponent
       },
     ]
   },
